@@ -5,9 +5,16 @@
   "private": true,
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "webpack serve -c build/webpack.dev.ts",
     "build": "webpack -c build/webpack.prod.ts",
-    "analyze": "npm run build && webpack --profile --json > ./dist/stats.json && webpack-bundle-analyzer ./dist/stats.json"
+    "dev:dev": "cross-env NODE_ENV=development BASE_ENV=development webpack serve -c build/webpack.dev.ts",
+    "dev:test": "cross-env NODE_ENV=development BASE_ENV=test webpack serve -c build/webpack.dev.ts",
+    "dev:pre": "cross-env NODE_ENV=development BASE_ENV=pre webpack serve -c build/webpack.dev.ts",
+    "dev:prod": "cross-env NODE_ENV=development BASE_ENV=production webpack serve -c build/webpack.dev.ts",
+    "build:dev": "cross-env NODE_ENV=production BASE_ENV=development webpack -c build/webpack.prod.ts",
+    "build:test": "cross-env NODE_ENV=production BASE_ENV=test webpack -c build/webpack.prod.ts",
+    "build:pre": "cross-env NODE_ENV=production BASE_ENV=pre webpack -c build/webpack.prod.ts",
+    "build:prod": "cross-env NODE_ENV=production BASE_ENV=production webpack -c build/webpack.prod.ts",
+    "build:analy": "cross-env NODE_ENV=production BASE_ENV=production webpack -c build/webpack.analy.ts"
   },
   "repository": {
     "type": "git",
@@ -33,8 +40,11 @@
     "@types/webpack-bundle-analyzer": "^4.6.0",
     "add": "^2.0.6",
     "babel-loader": "^9.1.2",
+    "copy-webpack-plugin": "^11.0.0",
     "core-js": "^3.29.0",
+    "cross-env": "^7.0.3",
     "css-loader": "^6.7.3",
+    "dotenv": "^16.0.3",
     "html-webpack-plugin": "^5.5.0",
     "style-loader": "^3.3.1",
     "ts-node": "^10.9.1",
