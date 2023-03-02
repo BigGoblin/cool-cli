@@ -1,34 +1,115 @@
 import { Configuration, DefinePlugin } from 'webpack';
 import HtmlWebpackPlugin from "html-webpack-plugin";
 import path from "path";
+import WebpackBar from 'webpackbar';
 
 import * as dotenv from "dotenv";
-
+const MiniCssExtractPlugin = require("mini-css-extract-plugin");
+const __DEV__ = process.env.NODE_ENV === 'development' // 是否是开发模式
 // 加载配置文件
 const envConfig = dotenv.config({
   path: path.resolve(__dirname, "../env/.env." + process.env.BASE_ENV),
 });
 
 
+const styleLoadersArray = [
+  __DEV__ ? "style-loader": MiniCssExtractPlugin.loader,
+  {
+    loader: "css-loader",
+    options: {
+      modules: {
+        localIdentName: "[path][name]__[local]--[hash:5]",
+      },
+    },
+  },
+  // 添加 postcss-loader
+  'postcss-loader'
+];
+
 const baseConfig: Configuration = {
   entry: path.join(__dirname, "../src/index.tsx"), // 入口文件
   // 打包出口文件
   output: {
-    filename: "static/js/[name].js", // 每个输出js的名称
+    filename: "static/js/[name].[chunkhash:8].js", // 每个输出js的名称
     path: path.join(__dirname, "../dist"), // 打包结果输出路径
     clean: true, // webpack4需要配置clean-webpack-plugin来删除dist文件,webpack5内置了
     publicPath: "/", // 打包后文件的公共前缀路径
+     // ... 这里自定义输出文件名的方式是，将某些资源发送到指定目录
+     assetModuleFilename: 'images/[hash][ext][query]'
   },
   // loader 配置
   module: {
     rules: [
       {
-        test: /.(ts|tsx)$/, //匹配ts tsx
-        use: 'babel-loader'    
+        test: /.(ts|tsx)$/, // 匹配.ts, tsx文件
+        use: [
+          // 'thread-loader',   //项目变大到一定程度之时再采用，否则效果反而不好
+           'babel-loader'],
+        exclude: /node_modules/,
       },{
-        test: /.css$/,
-        use: ["style-loader", "css-loader"]
-      }
+        test: /\.css$/,
+        use: styleLoadersArray
+      },{
+        test: /\.less$/,
+        use:[
+          ...styleLoadersArray,
+          {
+            loader: "less-loader",
+            options: {
+              lessOptions: {
+                importLoaders: 2,
+                // 可以加入modules: true，这样就不需要在less文件名加module了
+                modules: true,
+                // 如果要在less中写类型js的语法，需要加这一个配置
+                javascriptEnabled: true
+              },
+            },
+          }
+        ]
+      },{
+        test: /\.(png|jpe?g|gif|svg)$/i, // 匹配图片文件
+        type: "asset", // type选择asset
+        parser: {
+          dataUrlCondition: {
+            maxSize: 20 * 1024, // 小于10kb转base64
+          }
+        },
+        generator:{ 
+          filename:'static/images/[name].[contenthash:8][ext]', // 文件输出目录和命名
+        },
+      },
+      {
+        test:/.(woff2?|eot|ttf|otf)$/, // 匹配字体图标文件
+        type: "asset", // type选择asset
+        parser: {
+          dataUrlCondition: {
+            maxSize: 10 * 1024, // 小于10kb转base64
+          }
+        },
+        generator:{ 
+          filename:'static/fonts/[name].[contenthash:8][ext]', // 文件输出目录和命名
+        },
+      },
+      {
+        test:/.(mp4|webm|ogg|mp3|wav|flac|aac)$/, // 匹配媒体文件
+        type: "asset", // type选择asset
+        parser: {
+          dataUrlCondition: {
+            maxSize: 10 * 1024, // 小于10kb转base64
+          }
+        },
+        generator:{ 
+          filename:'static/media/[name].[contenthash:8][ext]', // 文件输出目录和命名
+        },
+      },{
+        // 匹配json文件
+        test: /\.json$/,
+        type: "asset/resource", // 将json文件视为文件类型
+        generator: {
+          // 这里专门针对json文件的处理
+          filename: "static/json/[name].[hash][ext][query]",
+        }
+      },
     ],
   },
   resolve: {
@@ -64,7 +145,17 @@ const baseConfig: Configuration = {
       "process.env.BASE_ENV": JSON.stringify(process.env.BASE_ENV),
       "process.env.NODE_ENV": JSON.stringify(process.env.NODE_ENV),
     }),
+    new WebpackBar({
+      color: "#85d",  // 默认green，进度条颜色支持HEX
+      basic: false,   // 默认true，启用一个简单的日志报告器
+      profile:false,  // 默认false，启用探查器。
+    })
+
   ],
+  cache:{
+    type: 'filesystem' // 使用文件缓存
+  },
+  
 };
 
 export default baseConfig
