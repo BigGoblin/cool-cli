@@ -18,7 +18,8 @@
     "lint:prettier": "prettier --write --loglevel warn \"src/**/*.{js,ts,json,tsx,css,less,scss,stylus,html,md}\"",
     "lint:md": "npx markdownlint --config .markdownlint.js --fix .",
     "lint:eslint": "eslint --fix --ext .js,.ts,.tsx ./src --max-warnings=0",
-    "pre-check": "tsc && npx lint-staged"
+    "pre-check": "tsc && npx lint-staged",
+    "commit": "git pull && git add -A && git-cz && git push"
   },
   "repository": {
     "type": "git",
@@ -40,6 +41,8 @@
     "@babel/preset-env": "^7.20.2",
     "@babel/preset-react": "^7.18.6",
     "@babel/preset-typescript": "^7.21.0",
+    "@commitlint/cli": "^17.4.4",
+    "@commitlint/config-conventional": "^17.4.4",
     "@pmmmwh/react-refresh-webpack-plugin": "^0.5.10",
     "@types/react": "^18.0.28",
     "@types/react-dom": "^18.0.11",
@@ -50,12 +53,14 @@
     "add": "^2.0.6",
     "autoprefixer": "^10.4.13",
     "babel-loader": "^9.1.2",
+    "commitizen": "^4.3.0",
     "compression-webpack-plugin": "^10.0.0",
     "copy-webpack-plugin": "^11.0.0",
     "core-js": "^3.29.0",
     "cross-env": "^7.0.3",
     "css-loader": "^6.7.3",
     "css-minimizer-webpack-plugin": "^4.2.2",
+    "cz-git": "^1.6.0",
     "dotenv": "^16.0.3",
     "eslint": "^8.36.0",
     "eslint-config-airbnb": "^19.0.4",
@@ -97,5 +102,10 @@
       "npm run lint:eslint",
       "npm run lint:prettier"
     ]
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-git"
+    }
   }
 }
