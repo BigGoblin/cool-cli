@@ -1,6 +1,6 @@
 {
   "name": "webapp-pre",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "一款集成 react + typescript + webpack 的脚手架",
   "private": true,
   "scripts": {
@@ -19,7 +19,8 @@
     "lint:md": "npx markdownlint --config .markdownlint.js --fix .",
     "lint:eslint": "eslint --fix --ext .js,.ts,.tsx ./src --max-warnings=0",
     "pre-check": "tsc && npx lint-staged",
-    "commit": "git pull && git add -A && git-cz && git push"
+    "commit": "git pull && git add -A && git-cz && git push",
+    "release": "standard-version"
   },
   "repository": {
     "type": "git",
@@ -86,6 +87,7 @@
     "purgecss-webpack-plugin": "^5.0.0",
     "react-refresh": "^0.14.0",
     "speed-measure-webpack-plugin": "^1.5.0",
+    "standard-version": "^9.5.0",
     "style-loader": "^3.3.1",
     "thread-loader": "^3.0.4",
     "ts-node": "^10.9.1",
